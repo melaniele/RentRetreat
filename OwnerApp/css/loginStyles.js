@@ -81,4 +81,14 @@ export const loginStyles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
+  header: {
+    backgroundColor: '#2C3A47',
+    borderRadius: 5,
+    marginRight: 15,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 0,
+    padding: 5
+  }
 });
