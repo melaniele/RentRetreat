@@ -12,6 +12,10 @@ import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import HouseInfo from "../components/HouseInfo";
 import AmenitiesItem from "../components/AmenitiesItem";
+import RNDateTimePicker, {
+  DateTimePicker,
+} from "@react-native-community/datetimepicker";
+
 const SAMPLE_LISTING = {
   address: "223 Sheppard Ave W",
   amenities: ["A/C", "Kitchen", "Parking", "WiFi", "TV", "HotTub"],
@@ -31,7 +35,42 @@ const SAMPLE_LISTING = {
 
 export default function ConfirmReservation({ route }) {
   const [listingInfo, setListingInfo] = useState({});
+  const [selectedFromDate, setSelectedFromDate] = useState(new Date());
 
+  // sets selectedToDate to be the next day by default
+  const [selectedToDate, setSelectedToDate] = useState(new Date(new Date().setDate(new Date().getDate() + 1)));
+
+  const [totalDays, setTotalDays] = useState(1);
+
+	const getDifferenceInDays = () => {
+		const diffenceTime = Math.abs(selectedToDate - selectedFromDate);
+		const differenceDays = Math.ceil(diffenceTime / (1000 * 60 * 60 * 24));
+		return differenceDays;
+	};
+
+	const getMinimumToDate = () => {
+    const minDate = new Date(selectedFromDate);
+    minDate.setDate(minDate.getDate() + 1);
+    return minDate;
+  };
+
+	const handleFromDateChange = (event, selectedDate) => {
+		const currentDate = selectedDate || selectedFromDate;
+		setSelectedFromDate(currentDate);
+		setTotalDays(getDifferenceInDays());
+	};
+
+	const handleToDateChange = (event, selectedDate) => {
+		const currentDate = selectedDate;
+		setSelectedToDate(currentDate);
+		setTotalDays(getDifferenceInDays());
+	};
+
+  const handleConfirmReservation = () => {
+		console.log("Confirming reservation");
+
+    console.log("total days: ", totalDays);
+  }
   useEffect(() => {
     fetchListingInfo();
 
@@ -62,8 +101,6 @@ export default function ConfirmReservation({ route }) {
     <View style={[styles.container]}>
       <ScrollView>
         {/* House image and basic info */}
-        {/* TODO: Maybe make this a component as it can be reused in every other screen */}
-
         <HouseInfo
           address={listingInfo.address}
           houseImage={listingInfo.houseImage}
@@ -104,55 +141,43 @@ export default function ConfirmReservation({ route }) {
         </View>
 
         {/* Pick Dates */}
-        {/* 
-           TODO: Sent an email asking if we can use the date picker library:
-  
-              https://www.npmjs.com/package/react-native-date-picker 
-              
-              If not, we can use the Picker library from Week 8.
-          */}
         <View style={[{ marginTop: 20 }]}>
-          <Text style={styles.headingTitle}>Pick Your Dates</Text>
+          <Text style={[styles.headingTitle]}>Pick Your Dates</Text>
           <View style={[styles.divider]}></View>
 
-          <View style={[{ flexDirection: "row", marginTop: 10, gap: 5 }]}>
-            <Text style={[{ fontWeight: "bold", fontSize: 20, flex: 1 }]}>
-              From
-            </Text>
-            <View
-              style={[
-                { backgroundColor: "lightgray", height: "100%", flex: 3 },
-              ]}
-            ></View>
-            <View
-              style={[
-                { backgroundColor: "lightgray", height: "100%", flex: 3 },
-              ]}
-            ></View>
-          </View>
-          <View style={[{ flexDirection: "row", marginTop: 10, gap: 5 }]}>
-            <Text style={[{ fontWeight: "bold", fontSize: 20, flex: 1 }]}>
-              To
-            </Text>
-            <View
-              style={[
-                { backgroundColor: "lightgray", height: "100%", flex: 3 },
-              ]}
-            ></View>
-            <View
-              style={[
-                { backgroundColor: "lightgray", height: "100%", flex: 3 },
-              ]}
-            ></View>
+          <View style={[styles.datePickerContainer]}>
+            <View style={[styles.datePickerSection]}>
+              <Text style={styles.dateLabel}>Check-in</Text>
+              <RNDateTimePicker
+                style={[styles.datePicker]}
+                mode="date"
+                display="default"
+                onChange={handleFromDateChange}
+                minimumDate={new Date()}
+                value={selectedFromDate}
+              />
+            </View>
+            <View style={[styles.datePickerSection]}>
+              <Text style={[styles.dateLabel, { marginLeft: 10 }]}>Check-out</Text>
+              <RNDateTimePicker
+                style={[styles.datePicker]}
+                mode="date"
+                display="default"
+                onChange={handleToDateChange}
+                minimumDate={getMinimumToDate()}
+                value={selectedToDate}
+              />
+            </View>
           </View>
         </View>
+        <View style={[styles.divider, {marginTop: 15}]}></View>
 
-        {/* Total Price (calculated from date * PricePerNight) */}
+        {/* Total Price */}
         <View style={[styles.totalPriceView]}>
-          <Text style={[styles.totalPriceText]}>Total Price: $333 CAD</Text>
+          <Text style={[styles.totalPriceText]}>Total Price: ${listingInfo.pricePerNight * totalDays} CAD</Text>
         </View>
         <View>
-          <Pressable style={[styles.confirmPressable]}>
+          <Pressable style={[styles.confirmPressable]} onPress={handleConfirmReservation}>
             <Text style={[styles.confirmPressableText]}>
               Confirm Reservation
             </Text>
@@ -217,5 +242,25 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     marginTop: 20,
+  },
+
+  datePickerContainer: {
+    flexDirection: "row",
+    marginTop: 1,
+  },
+  datePickerSection: {
+    flex: 1,
+    alignItems: "center",
+    // flexDirection: "row",
+    justifyContent: "flex-start",
+    marginLeft: 0,
+  },
+  dateLabel: {
+    fontWeight: "bold",
+    fontSize: 20,
+    flex: 1,
+  },
+  datePicker: {
+    flex: 3,
   },
 });
