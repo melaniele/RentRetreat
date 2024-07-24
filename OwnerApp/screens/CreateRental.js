@@ -2,23 +2,29 @@ import React from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native';
 import * as Location from 'expo-location';
+import { useIsFocused, StackActions } from '@react-navigation/native';
 
 import { useState, useEffect } from 'react';
 
 import { db } from '../firebaseConfig';
 import { addDoc, getDocs, collection } from 'firebase/firestore';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
 
 import isUserInputValid from '../utils/validateUserInput.js';
 import { createRentalStyles } from '../css/createRentalStyles.js';
+import { loginStyles } from '../css/loginStyles.js';
 
-export default function CreateRental({ route }) {
+export default function CreateRental({ navigation, route }) {
+  const isUserOnThisScreen = useIsFocused();
+
   const [noOfBeds, onChangeBeds] = React.useState('');
   const [noOfBathrooms, onChangeBathrooms] = React.useState('');
   const [noOfGuests, onChangeGuests] = React.useState('');
@@ -37,6 +43,62 @@ export default function CreateRental({ route }) {
   useEffect(() => {
     requestLocationPermissions();
   }, []);
+
+  useEffect(() => {
+    setHeader();
+  }, [isUserOnThisScreen]);
+
+  useEffect(() => {
+    const listener = onAuthStateChanged(auth, (userFromFirebaseAuth) => {
+      if (userFromFirebaseAuth) {
+        console.log(`user is logged in: ${userFromFirebaseAuth.email}`);
+      } else {
+        console.log(`user is logged out`);
+      }
+    });
+    return listener;
+  }, []);
+
+  const setHeader = () => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            logoutPressed();
+          }}
+          style={{
+            ...loginStyles.header,
+            marginLeft: 15,
+            backgroundColor: '#fa8231',
+            padding: 7
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              color: 'black'
+            }}
+          >
+            Sign Out
+          </Text>
+        </TouchableOpacity>
+      )
+    });
+  };
+
+  const logoutPressed = async () => {
+    try {
+      await signOut(auth);
+      navigation.dispatch(StackActions.popToTop());
+      console.log('user has been logged out');
+    } catch (error) {
+      console.log(`error logging out: ${error}`);
+      Alert.alert(
+        'Error logging out',
+        `There was an error logging out: ${error}`
+      );
+    }
+  };
 
   const requestLocationPermissions = async () => {
     try {
@@ -157,7 +219,9 @@ export default function CreateRental({ route }) {
           <View style={createRentalStyles.inputContainer}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={createRentalStyles.text}>Address </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>*</Text>
+              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
+                *
+              </Text>
             </View>
             <TextInput
               style={{
@@ -173,7 +237,9 @@ export default function CreateRental({ route }) {
           <View style={createRentalStyles.inputContainer}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={createRentalStyles.text}>City </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>*</Text>
+              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
+                *
+              </Text>
             </View>
             <TextInput
               style={{
@@ -189,7 +255,9 @@ export default function CreateRental({ route }) {
           <View style={createRentalStyles.inputContainer}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={createRentalStyles.text}>No of Beds </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>*</Text>
+              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
+                *
+              </Text>
             </View>
             <TextInput
               style={createRentalStyles.input}
@@ -202,7 +270,9 @@ export default function CreateRental({ route }) {
           <View style={createRentalStyles.inputContainer}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={createRentalStyles.text}>No of Bathrooms </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>*</Text>
+              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
+                *
+              </Text>
             </View>
             <TextInput
               style={createRentalStyles.input}
@@ -215,7 +285,9 @@ export default function CreateRental({ route }) {
           <View style={createRentalStyles.inputContainer}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={createRentalStyles.text}>No of Guests </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>*</Text>
+              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
+                *
+              </Text>
             </View>
             <TextInput
               style={createRentalStyles.input}
@@ -228,7 +300,9 @@ export default function CreateRental({ route }) {
           <View style={createRentalStyles.inputContainer}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={createRentalStyles.text}>Description </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>*</Text>
+              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
+                *
+              </Text>
             </View>
             <TextInput
               style={{
@@ -246,7 +320,9 @@ export default function CreateRental({ route }) {
           <View style={createRentalStyles.inputContainer}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={createRentalStyles.text}>Price per Night </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>*</Text>
+              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
+                *
+              </Text>
             </View>
             <TextInput
               style={createRentalStyles.input}
@@ -260,7 +336,9 @@ export default function CreateRental({ route }) {
             style={createRentalStyles.pressable}
             onPress={createRental}
           >
-            <Text style={createRentalStyles.createRentalText}>Create Rental</Text>
+            <Text style={createRentalStyles.createRentalText}>
+              Create Rental
+            </Text>
           </TouchableOpacity>
         </>
       )}
