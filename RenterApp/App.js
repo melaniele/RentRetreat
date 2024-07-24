@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import Login from "./screens/Login";
 import Discover from "./screens/Discover";
@@ -11,7 +12,20 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TabContainerComponent = () => (
-  <Tab.Navigator>
+  <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused }) => {
+        if (route.name == "Discover") {
+          return <FontAwesome5 name="home" size={24} color={focused ? "black" : "gray"} />;
+        }
+        if (route.name === "My Reservations") {
+          return <FontAwesome5 name="calendar-alt" size={24} color={focused ? "black" : "gray"} />;
+        }
+      },
+      tabBarActiveTintColor: "black",
+      tabBarInactiveTintColor: "gray",
+    })}
+  >
     <Tab.Screen name="Discover" component={Discover} 
     options={{
       headerShown: true,
