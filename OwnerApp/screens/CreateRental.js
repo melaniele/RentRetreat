@@ -9,6 +9,8 @@ import {
   Alert
 } from 'react-native';
 import * as Location from 'expo-location';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 import { useIsFocused, StackActions } from '@react-navigation/native';
 
 import { useState, useEffect } from 'react';
@@ -154,6 +156,7 @@ export default function CreateRental({ navigation, route }) {
     let homes = {};
     let randomHomeImage = '';
     let amenities = [];
+    const id = uuidv4();
 
     try {
       const countriesRef = collection(db, 'homes');
@@ -194,7 +197,8 @@ export default function CreateRental({ navigation, route }) {
           address,
           lat: lat,
           lng: lng,
-          ownerEmail: email
+          ownerEmail: email,
+          id
         });
         alert('Rental created!');
       } catch (error) {
