@@ -5,25 +5,16 @@ import {
   StyleSheet,
   Image,
   Pressable,
+  FlatList,
 } from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { db } from "../firebaseConfig";
-import {
-  collection,
-  addDoc,
-  query,
-  where,
-  getDocs,
-  deleteDoc,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import HouseInfo from "../components/HouseInfo";
-
+import AmenitiesItem from "../components/AmenitiesItem";
 const SAMPLE_LISTING = {
   address: "223 Sheppard Ave W",
-  amenities: ["A/C", "Kitchen"],
+  amenities: ["A/C", "Kitchen", "Parking", "WiFi", "TV", "HotTub"],
   city: "North York",
   description: "NO PARTIES ALLOWED!!!",
   houseImage:
@@ -56,7 +47,7 @@ export default function ConfirmReservation({ route }) {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
+        // console.log("Document data:", docSnap.data());
         setListingInfo(docSnap.data());
       } else if (docSnap.data() === undefined) {
         // docSnap.data() will be undefined in this case
@@ -105,28 +96,11 @@ export default function ConfirmReservation({ route }) {
           <View style={[styles.divider]}></View>
 
           {/* Make this a FlatList */}
-          <View
-            style={[
-              { flexDirection: "row", alignItems: "center", marginVertical: 5 },
-            ]}
-          >
-            <FontAwesome5 name="snowflake" size={25} color="gray" />
-            <Text style={[{ marginLeft: 15, color: "gray", fontSize: 22 }]}>
-              Air conditioning
-            </Text>
-          </View>
-
-          {/* Add to flatList*/}
-          <View
-            style={[
-              { flexDirection: "row", alignItems: "center", marginVertical: 5 },
-            ]}
-          >
-            <FontAwesome5 name="tv" size={19} color="gray" />
-            <Text style={[{ marginLeft: 15, color: "gray", fontSize: 22 }]}>
-              TV
-            </Text>
-          </View>
+          <FlatList
+            data={listingInfo.amenities}
+            renderItem={({ item }) => <AmenitiesItem amenity={item} />}
+            keyExtractor={(item) => item}
+          />
         </View>
 
         {/* Pick Dates */}
