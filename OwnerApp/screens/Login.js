@@ -1,6 +1,6 @@
-import { FontAwesome5 } from "@expo/vector-icons";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { FontAwesome5 } from '@expo/vector-icons';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useEffect, useState } from 'react';
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -9,23 +9,23 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-} from "react-native";
-import { loginStyles } from "../css/loginStyles";
-import { auth } from "../firebaseConfig";
+  View
+} from 'react-native';
+import { loginStyles } from '../css/loginStyles';
+import { auth } from '../firebaseConfig';
 
 export default Login = ({ navigation }) => {
-  const [emailAddress, setEmailAddress] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [emailAddress, setEmailAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    setError("");
+    setError('');
   }, [emailAddress, password]);
 
   const onLoginClicked = async () => {
-    if (emailAddress === "" || password === "") {
-      setError("Email and Password cannot be empty.");
+    if (emailAddress === '' || password === '') {
+      setError('Email and Password cannot be empty.');
     } else {
       try {
         const userCredential = await signInWithEmailAndPassword(
@@ -33,10 +33,12 @@ export default Login = ({ navigation }) => {
           emailAddress,
           password
         );
-        console.log("login successful");
-        //navigation.navigate("Home", {user: emailAddress});
+        navigation.navigate('Home', {
+          screen: 'Create Rental',
+          params: { email: userCredential.user.email }
+        });
       } catch (error) {
-        setError("Credentials are invalid, please try again!");
+        setError('Credentials are invalid, please try again!');
         console.log({ error });
       }
     }
@@ -44,11 +46,11 @@ export default Login = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require("./../assets/loginPage.jpeg")}
+      source={require('./../assets/loginPage.jpeg')}
       style={loginStyles.backgroundImage}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={loginStyles.keyboardAvoidingView}
       >
         <SafeAreaView style={loginStyles.container}>
@@ -56,7 +58,7 @@ export default Login = ({ navigation }) => {
             Welcome to RentRetreat
           </Text>
           <Text style={[loginStyles.textShadow, loginStyles.ownerTitle]}>
-            {"Create your\nrental today!"}
+            {'Create your\nrental today!'}
           </Text>
 
           <View style={loginStyles.loginSection}>
@@ -68,6 +70,8 @@ export default Login = ({ navigation }) => {
               placeholder="Username/Email"
               value={emailAddress}
               onChangeText={setEmailAddress}
+              autoCapitalize="none"
+              autoCorrect={false}
             />
             <TextInput
               style={loginStyles.input}
@@ -89,7 +93,11 @@ export default Login = ({ navigation }) => {
               <Text style={loginStyles.buttonText}>
                 Login
                 <View style={loginStyles.icon}>
-                  <FontAwesome5 name="arrow-right" size={18} color="white" />
+                  <FontAwesome5
+                    name="arrow-right"
+                    size={18}
+                    color="white"
+                  />
                 </View>
               </Text>
             </TouchableOpacity>
