@@ -70,6 +70,11 @@ export default function ConfirmReservation({ route }) {
 		console.log("Confirming reservation");
 
     console.log("total days: ", totalDays);
+		console.log("from date: ", typeof(selectedFromDate.getTime()));
+		console.log("from date: ", selectedFromDate.getTime());
+		console.log("until date: ", selectedToDate.getTime());
+		// convert so that I can use it in the database
+		const fromDate = selectedFromDate.getTime();
   }
   useEffect(() => {
     fetchListingInfo();
@@ -154,6 +159,10 @@ export default function ConfirmReservation({ route }) {
                 display="default"
                 onChange={handleFromDateChange}
                 minimumDate={new Date()}
+
+                // Maximum added as the requirements specify that a user cannot choose their dates.
+                maximumDate={new Date()}
+
                 value={selectedFromDate}
               />
             </View>
@@ -164,7 +173,15 @@ export default function ConfirmReservation({ route }) {
                 mode="date"
                 display="default"
                 onChange={handleToDateChange}
+
+                // Minimum date should be the next day of the Check-in date.
                 minimumDate={getMinimumToDate()}
+
+                // Added maximum date to be the same value as minimum as the requirements
+                // specify that a user cannot choose their dates. Though, this property
+                // can be removed to allow the user to choose their own dates if needed.
+                maximumDate={getMinimumToDate()}
+
                 value={selectedToDate}
               />
             </View>
