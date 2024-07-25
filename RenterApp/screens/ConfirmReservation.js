@@ -8,7 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import { db } from "../firebaseConfig";
-import { doc, getDoc, addDoc, collection } from "firebase/firestore";
+import { doc, getDoc, addDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import HouseInfo from "../components/HouseInfo";
 import AmenitiesItem from "../components/AmenitiesItem";
@@ -33,15 +33,17 @@ const SAMPLE_LISTING = {
   status: "confirmed",
 };
 
+const SAMPLE_OWNER = {"email": "owner1@gmail.com", "firstname": "Olivia", "lastname": "Zhang", "picture": "https://randomuser.me/api/portraits/women/2.jpg", "userType": "owner"}
+
 export default function ConfirmReservation({ route }) {
   const [listingInfo, setListingInfo] = useState({});
-  const [selectedFromDate, setSelectedFromDate] = useState(new Date());
+  const [ownerInfo, setOwnerInfo] = useState({});
 
+  const [selectedFromDate, setSelectedFromDate] = useState(new Date());
   // sets selectedToDate to be the next day by default
   const [selectedToDate, setSelectedToDate] = useState(
     new Date(new Date().setDate(new Date().getDate() + 1))
   );
-
   const [totalDays, setTotalDays] = useState(1);
 
   const getDifferenceInDays = () => {
@@ -83,40 +85,63 @@ export default function ConfirmReservation({ route }) {
       totalPrice: listingInfo.pricePerNight * totalDays,
     };
 
+    // Insert the reservation request into the database
     try {
-      // insert the document into a collection called "students"
       const docRef = await addDoc(
         collection(db, "reservationRequests"),
         reservationRequest
       );
-      // get the id of the created document
-      console.log(docRef.id);
     } catch (err) {
       console.log(err);
     }
+    
   };
 
   useEffect(() => {
-    // fetchListingInfo();
+    fetchListingInfo();
     console.log(route.params.renterEmail);
     // For testing purposes
-    setListingInfo(SAMPLE_LISTING);
+    // setListingInfo(SAMPLE_LISTING);
+    // fetchOwnerInfo("owner1@gmail.com")
   }, []);
 
   const fetchListingInfo = async () => {
     try {
       const docRef = doc(db, "listings", route.params.listingID);
-
-      // Attempt to get the specified document
-      const docSnap = await getDoc(docRef);
+      const docSnap = await getDoc(docRef)
 
       if (docSnap.exists()) {
         // console.log("Document data:", docSnap.data());
-        setListingInfo(docSnap.data());
+        setListingInfo(docSnap.data())
+        
+        // Once we have the information about the listing, we can fetch the owner's information.
+        fetchOwnerInfo(docSnap.data().ownerEmail);
+
       } else if (docSnap.data() === undefined) {
-        // docSnap.data() will be undefined in this case
         console.log("No such document!");
       }
+    } catch (err) {
+      console.log(err);
+    }
+
+  };
+
+  const fetchOwnerInfo = async (ownerEmail) => {
+    try {
+      // create a query
+      const getUserByEmailQuery = query(
+        collection(db, "users"),
+        where("email", "==", ownerEmail)
+      );
+
+      const querySnapshot = await getDocs(getUserByEmailQuery);
+
+      
+      querySnapshot.forEach((currDoc) => {
+        // console.log(currDoc.id, " => ", currDoc.data());
+        setOwnerInfo(currDoc.data());
+      });
+
     } catch (err) {
       console.log(err);
     }
@@ -139,10 +164,10 @@ export default function ConfirmReservation({ route }) {
         {/* Owner Info */}
         <View style={[styles.ownerView]}>
           <Image
-            source={{ uri: "https://randomuser.me/api/portraits/men/18.jpg" }}
+            source={{ uri: ownerInfo.picture }}
             style={{ width: 65, height: 65, borderRadius: 30 }}
           />
-          <Text style={styles.ownerNameText}>John Doe</Text>
+          <Text style={styles.ownerNameText}>{ownerInfo.firstname} {ownerInfo.lastname}</Text>
         </View>
 
         {/* Description */}
