@@ -8,7 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import { db } from "../firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, addDoc, collection } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import HouseInfo from "../components/HouseInfo";
 import AmenitiesItem from "../components/AmenitiesItem";
@@ -38,49 +38,69 @@ export default function ConfirmReservation({ route }) {
   const [selectedFromDate, setSelectedFromDate] = useState(new Date());
 
   // sets selectedToDate to be the next day by default
-  const [selectedToDate, setSelectedToDate] = useState(new Date(new Date().setDate(new Date().getDate() + 1)));
+  const [selectedToDate, setSelectedToDate] = useState(
+    new Date(new Date().setDate(new Date().getDate() + 1))
+  );
 
   const [totalDays, setTotalDays] = useState(1);
 
-	const getDifferenceInDays = () => {
-		const diffenceTime = Math.abs(selectedToDate - selectedFromDate);
-		const differenceDays = Math.ceil(diffenceTime / (1000 * 60 * 60 * 24));
-		return differenceDays;
-	};
+  const getDifferenceInDays = () => {
+    const diffenceTime = Math.abs(selectedToDate - selectedFromDate);
+    const differenceDays = Math.ceil(diffenceTime / (1000 * 60 * 60 * 24));
+    return differenceDays;
+  };
 
-	const getMinimumToDate = () => {
+  const getMinimumToDate = () => {
     const minDate = new Date(selectedFromDate);
     minDate.setDate(minDate.getDate() + 1);
     return minDate;
   };
 
-	const handleFromDateChange = (event, selectedDate) => {
-		const currentDate = selectedDate || selectedFromDate;
-		setSelectedFromDate(currentDate);
-		setTotalDays(getDifferenceInDays());
-	};
+  const handleFromDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || selectedFromDate;
+    setSelectedFromDate(currentDate);
+    setTotalDays(getDifferenceInDays());
+  };
 
-	const handleToDateChange = (event, selectedDate) => {
-		const currentDate = selectedDate;
-		setSelectedToDate(currentDate);
-		setTotalDays(getDifferenceInDays());
-	};
+  const handleToDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setSelectedToDate(currentDate);
+    setTotalDays(getDifferenceInDays());
+  };
 
-  const handleConfirmReservation = () => {
-		console.log("Confirming reservation");
+  const handleConfirmReservation = async () => {
+    // Convert the values to timestamps
+    const fromDate = selectedFromDate.getTime();
+    const untilDate = selectedToDate.getTime();
 
-    console.log("total days: ", totalDays);
-		console.log("from date: ", typeof(selectedFromDate.getTime()));
-		console.log("from date: ", selectedFromDate.getTime());
-		console.log("until date: ", selectedToDate.getTime());
-		// convert so that I can use it in the database
-		const fromDate = selectedFromDate.getTime();
-  }
+    const reservationRequest = {
+      listingID: route.params.listingID,
+      checkinDate: fromDate,
+      checkoutDate: untilDate,
+      status: "CONFIRMED",
+      ownerEmail: listingInfo.ownerEmail,
+      renterEmail: route.params.renterEmail,
+      totalPrice: listingInfo.pricePerNight * totalDays,
+    };
+
+    try {
+      // insert the document into a collection called "students"
+      const docRef = await addDoc(
+        collection(db, "reservationRequests"),
+        reservationRequest
+      );
+      // get the id of the created document
+      console.log(docRef.id);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
-    fetchListingInfo();
-
+    // fetchListingInfo();
+    console.log(route.params.renterEmail);
     // For testing purposes
-    // setListingInfo(SAMPLE_LISTING);
+    setListingInfo(SAMPLE_LISTING);
   }, []);
 
   const fetchListingInfo = async () => {
@@ -159,42 +179,44 @@ export default function ConfirmReservation({ route }) {
                 display="default"
                 onChange={handleFromDateChange}
                 minimumDate={new Date()}
-
                 // Maximum added as the requirements specify that a user cannot choose their dates.
                 maximumDate={new Date()}
-
                 value={selectedFromDate}
               />
             </View>
             <View style={[styles.datePickerSection]}>
-              <Text style={[styles.dateLabel, { marginLeft: 10 }]}>Check-out</Text>
+              <Text style={[styles.dateLabel, { marginLeft: 10 }]}>
+                Check-out
+              </Text>
               <RNDateTimePicker
                 style={[styles.datePicker]}
                 mode="date"
                 display="default"
                 onChange={handleToDateChange}
-
                 // Minimum date should be the next day of the Check-in date.
                 minimumDate={getMinimumToDate()}
-
                 // Added maximum date to be the same value as minimum as the requirements
                 // specify that a user cannot choose their dates. Though, this property
                 // can be removed to allow the user to choose their own dates if needed.
                 maximumDate={getMinimumToDate()}
-
                 value={selectedToDate}
               />
             </View>
           </View>
         </View>
-        <View style={[styles.divider, {marginTop: 15}]}></View>
+        <View style={[styles.divider, { marginTop: 15 }]}></View>
 
         {/* Total Price */}
         <View style={[styles.totalPriceView]}>
-          <Text style={[styles.totalPriceText]}>Total Price: ${listingInfo.pricePerNight * totalDays} CAD</Text>
+          <Text style={[styles.totalPriceText]}>
+            Total Price: ${listingInfo.pricePerNight * totalDays} CAD
+          </Text>
         </View>
         <View>
-          <Pressable style={[styles.confirmPressable]} onPress={handleConfirmReservation}>
+          <Pressable
+            style={[styles.confirmPressable]}
+            onPress={handleConfirmReservation}
+          >
             <Text style={[styles.confirmPressableText]}>
               Confirm Reservation
             </Text>
