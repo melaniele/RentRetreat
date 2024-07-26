@@ -34,6 +34,10 @@ export default Login = ({ navigation }) => {
           password
         );
         console.log("login successful");
+        navigation.navigate('Home', {
+          screen: 'Discover',
+          params: { email: userCredential.user.email }
+        });
         //navigation.navigate("Home", {user: emailAddress});
       } catch (error) {
         setError("Credentials are invalid, please try again!");
