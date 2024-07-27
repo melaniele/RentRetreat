@@ -21,8 +21,9 @@ import { auth } from '../firebaseConfig';
 import isUserInputValid from '../utils/validateUserInput.js';
 import { createRentalStyles } from '../css/createRentalStyles.js';
 import { loginStyles } from '../css/loginStyles.js';
+import { useAuth } from '../store/AuthContext';
 
-export default function CreateRental({ navigation, route }) {
+export default function CreateRental({ navigation }) {
   const isUserOnThisScreen = useIsFocused();
 
   const [noOfBeds, onChangeBeds] = React.useState('');
@@ -30,7 +31,7 @@ export default function CreateRental({ navigation, route }) {
   const [noOfGuests, onChangeGuests] = React.useState('');
   const [description, onChangeDescription] = React.useState('');
   const [price, onChangePrice] = React.useState('');
-  const { email } = route.params;
+  const { loggedInUserEmail } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -187,14 +188,14 @@ export default function CreateRental({ navigation, route }) {
           noOfGuests: parseInt(noOfGuests),
           description,
           pricePerNight: parseInt(price),
-          status: 'confirmed',
+          status: 'CONFIRMED',
           houseImage: randomHomeImage,
           amenities,
           city,
           address,
           lat: lat,
           lng: lng,
-          ownerEmail: email
+          ownerEmail: loggedInUserEmail
         });
         alert('Rental created!');
       } catch (error) {

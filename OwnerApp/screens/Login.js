@@ -13,11 +13,13 @@ import {
 } from 'react-native';
 import { loginStyles } from '../css/loginStyles';
 import { auth } from '../firebaseConfig';
+import { useAuth } from '../store/AuthContext';
 
 export default Login = ({ navigation }) => {
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { setLoggedInUserEmail } = useAuth();
 
   useEffect(() => {
     setError('');
@@ -33,9 +35,9 @@ export default Login = ({ navigation }) => {
           emailAddress,
           password
         );
+        setLoggedInUserEmail(userCredential.user.email);
         navigation.navigate('Home', {
-          screen: 'Create Rental',
-          params: { email: userCredential.user.email }
+          screen: 'Create Rental'
         });
       } catch (error) {
         setError('Credentials are invalid, please try again!');
