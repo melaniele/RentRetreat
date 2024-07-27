@@ -1,6 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useEffect, useState } from "react";
+import {useAuth} from "../components/AuthContext";
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -15,6 +16,7 @@ import { loginStyles } from "../css/loginStyles";
 import { auth } from "../firebaseConfig";
 
 export default Login = ({ navigation }) => {
+  const { setLoggedInUserEmail } = useAuth();
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -34,6 +36,9 @@ export default Login = ({ navigation }) => {
           password
         );
         console.log("login successful");
+
+        setLoggedInUserEmail(userCredential.user.email);
+
         navigation.navigate('Home', {
           screen: 'Discover',
           params: { email: userCredential.user.email }

@@ -15,6 +15,7 @@ import AmenitiesItem from "../components/AmenitiesItem";
 import RNDateTimePicker, {
   DateTimePicker,
 } from "@react-native-community/datetimepicker";
+import { useAuth } from "../components/AuthContext";
 
 const SAMPLE_LISTING = {
   address: "223 Sheppard Ave W",
@@ -36,6 +37,7 @@ const SAMPLE_LISTING = {
 const SAMPLE_OWNER = {"email": "owner1@gmail.com", "firstname": "Olivia", "lastname": "Zhang", "picture": "https://randomuser.me/api/portraits/women/2.jpg", "userType": "owner"}
 
 export default function ConfirmReservation({ route }) {
+  const { loggedInUserEmail } = useAuth();
   const [listingInfo, setListingInfo] = useState({});
   const [ownerInfo, setOwnerInfo] = useState({});
 
@@ -98,6 +100,7 @@ export default function ConfirmReservation({ route }) {
   };
 
   useEffect(() => {
+    console.log("Logged in user email: ", loggedInUserEmail);
     fetchListingInfo();
     console.log(route.params.renterEmail);
     // For testing purposes

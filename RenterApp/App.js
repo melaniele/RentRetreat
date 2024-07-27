@@ -7,6 +7,7 @@ import Login from "./screens/Login";
 import Discover from "./screens/Discover";
 import ConfirmReservation from "./screens/ConfirmReservation";
 import MyReservations from "./screens/MyReservations";
+import { AuthProvider } from "./components/AuthContext";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,6 +42,7 @@ const TabContainerComponent = () => (
 
 export default function App() {
   return (
+    <AuthProvider>
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Login"
@@ -54,5 +56,6 @@ export default function App() {
         }}/>
       </Stack.Navigator>
     </NavigationContainer>
+    </AuthProvider>
   );
 }
