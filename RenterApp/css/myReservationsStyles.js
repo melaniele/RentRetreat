@@ -3,16 +3,15 @@ import { StyleSheet } from 'react-native';
 export const myReservationsStyles = StyleSheet.create({
   reservedListingsList: {
     alignContent: 'stretch',
-    width: '80%'
+    width: '100%',
+    padding: 30,
   },
   container: {
-    flex: 1,
-    // backgroundColor: '#535c68',
+    width: "100%",
     alignItems: 'center',
     justifyContent: 'center'
   },
   listItem: {
-    width: '100%',
     paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
