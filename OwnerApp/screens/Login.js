@@ -1,6 +1,7 @@
-import { FontAwesome5 } from '@expo/vector-icons';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useEffect, useState } from 'react';
+import { FontAwesome5 } from "@expo/vector-icons";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -9,25 +10,25 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
-} from 'react-native';
-import { loginStyles } from '../css/loginStyles';
-import { auth } from '../firebaseConfig';
-import { useAuth } from '../store/AuthContext';
+  View,
+} from "react-native";
+import { loginStyles } from "../css/loginStyles";
+import { auth, db } from "../firebaseConfig";
+import { useAuth } from "../store/AuthContext";
 
 export default Login = ({ navigation }) => {
-  const [emailAddress, setEmailAddress] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const { setLoggedInUserEmail } = useAuth();
-
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  
   useEffect(() => {
-    setError('');
+    setError("");
   }, [emailAddress, password]);
 
   const onLoginClicked = async () => {
-    if (emailAddress === '' || password === '') {
-      setError('Email and Password cannot be empty.');
+    if (emailAddress === "" || password === "") {
+      setError("Email and Password cannot be empty.");
     } else {
       try {
         const userCredential = await signInWithEmailAndPassword(
@@ -35,24 +36,65 @@ export default Login = ({ navigation }) => {
           emailAddress,
           password
         );
-        setLoggedInUserEmail(userCredential.user.email);
-        navigation.navigate('Home', {
-          screen: 'Create Rental'
-        });
+
+        // validate login
+        validateResult = await validateLogin(userCredential.user.email);
+        if (validateResult) {
+          setLoggedInUserEmail(userCredential.user.email);
+          navigation.navigate("Home", {
+            screen: "Create Rental",
+          });
+          handleClearFields();
+        } else {
+          setError("User is not an owner, please try again!");
+        }
       } catch (error) {
-        setError('Credentials are invalid, please try again!');
+        setError("Credentials are invalid, please try again!");
         console.log({ error });
       }
     }
   };
 
+  // Validate whether user is an owner or not
+  const validateLogin = async (userEmail) => {
+    try {
+      const userQuery = query(
+        collection(db, "users"),
+        where("email", "==", userEmail)
+      );
+
+      const querySnapshot = await getDocs(userQuery);
+      let isOwner = false;
+      querySnapshot.forEach((currDoc) => {
+        const user = {
+          id: currDoc.id,
+          ...currDoc.data(),
+        };
+        if (user.userType === "owner") {
+          isOwner = true;
+        }
+      });
+
+      return isOwner;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  const handleClearFields = () => {
+    setEmailAddress("");
+    setPassword("");
+    setError("");
+  };
+
   return (
     <ImageBackground
-      source={require('./../assets/loginPage.jpeg')}
+      source={require("./../assets/loginPage.jpeg")}
       style={loginStyles.backgroundImage}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={loginStyles.keyboardAvoidingView}
       >
         <SafeAreaView style={loginStyles.container}>
@@ -60,7 +102,7 @@ export default Login = ({ navigation }) => {
             Welcome to RentRetreat
           </Text>
           <Text style={[loginStyles.textShadow, loginStyles.ownerTitle]}>
-            {'Create your\nrental today!'}
+            {"Create your\nrental today!"}
           </Text>
 
           <View style={loginStyles.loginSection}>
@@ -95,11 +137,7 @@ export default Login = ({ navigation }) => {
               <Text style={loginStyles.buttonText}>
                 Login
                 <View style={loginStyles.icon}>
-                  <FontAwesome5
-                    name="arrow-right"
-                    size={18}
-                    color="white"
-                  />
+                  <FontAwesome5 name="arrow-right" size={18} color="white" />
                 </View>
               </Text>
             </TouchableOpacity>
