@@ -35,8 +35,8 @@ export default function CreateRental({ navigation }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [latitude, setLatitude] = useState('-33.8568');
-  const [longitude, setLongitude] = useState('151.2153');
+  const [latitude, setLatitude] = useState(-33.8568);
+  const [longitude, setLongitude] = useState(151.2153);
 
   const [city, onChangeCity] = React.useState('Toronto');
   const [address, onChangeAddress] = React.useState('1750 Finch Avenue East');
