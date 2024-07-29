@@ -35,8 +35,8 @@ export default function CreateRental({ navigation }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [latitude, setLatitude] = useState(-33.8568);
-  const [longitude, setLongitude] = useState(151.2153);
+  const [lat, setLat] = useState('-33.8568');
+  const [lng, setLng] = useState('151.2153');
 
   const [city, onChangeCity] = React.useState('Toronto');
   const [address, onChangeAddress] = React.useState('1750 Finch Avenue East');
@@ -127,8 +127,8 @@ export default function CreateRental({ navigation }) {
         return false;
       }
 
-      setLatitude(result.latitude);
-      setLongitude(result.longitude);
+      setLat(result.latitude);
+      setLng(result.longitude);
       return true;
     } catch (err) {
       console.log(err);
@@ -193,8 +193,8 @@ export default function CreateRental({ navigation }) {
           amenities,
           city,
           address,
-          latitude: latitude,
-          longitude: longitude,
+          lat: lat,
+          lng: lng,
           ownerEmail: loggedInUserEmail
         });
         alert('Rental created!');
