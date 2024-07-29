@@ -21,7 +21,7 @@ export default Login = ({ navigation }) => {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
+  
   useEffect(() => {
     setError("");
   }, [emailAddress, password]);

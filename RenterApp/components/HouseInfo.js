@@ -21,7 +21,7 @@ import {
     isDeclined = false,
   }) {
     return (
-      <View style={[{}]}>
+      <View style={[{width: "100%"}]}>
         <Image
           source={{
             uri: houseImage,
