@@ -74,6 +74,8 @@ export default Login = ({ navigation }) => {
               placeholder="Username/Email"
               value={emailAddress}
               onChangeText={setEmailAddress}
+              autoCapitalize="none"
+              autoCorrect={false}
             />
             <TextInput
               style={loginStyles.input}
