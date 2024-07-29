@@ -1,7 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import {useAuth} from "../components/AuthContext";
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -12,8 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAuth } from "../components/AuthContext";
 import { loginStyles } from "../css/loginStyles";
-import { auth } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 
 export default Login = ({ navigation }) => {
   const { setLoggedInUserEmail } = useAuth();
@@ -35,20 +36,58 @@ export default Login = ({ navigation }) => {
           emailAddress,
           password
         );
-        console.log("login successful");
 
-        setLoggedInUserEmail(userCredential.user.email);
-
-        navigation.navigate('Home', {
-          screen: 'Discover',
-          params: { email: userCredential.user.email }
-        });
-        //navigation.navigate("Home", {user: emailAddress});
+        // validate login
+        validateResult = await validateLogin(userCredential.user.email);
+        if (validateResult) {
+          console.log("login successful");
+          setLoggedInUserEmail(userCredential.user.email);
+          navigation.navigate("Home", {
+            screen: "Discover",
+            params: { email: userCredential.user.email },
+          });
+          handleClearFields();
+        } else {
+          setError("User is not an renter, please try again!");
+        }
       } catch (error) {
         setError("Credentials are invalid, please try again!");
         console.log({ error });
       }
     }
+  };
+
+  // Validate whether user is a renter or not
+  const validateLogin = async (userEmail) => {
+    try {
+      const userQuery = query(
+        collection(db, "users"),
+        where("email", "==", userEmail)
+      );
+
+      const querySnapshot = await getDocs(userQuery);
+      let isRenter = false;
+      querySnapshot.forEach((currDoc) => {
+        const user = {
+          id: currDoc.id,
+          ...currDoc.data(),
+        };
+        if (user.userType === "renter") {
+          isRenter = true;
+        }
+      });
+
+      return isRenter;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  const handleClearFields = () => {
+    setEmailAddress("");
+    setPassword("");
+    setError("");
   };
 
   return (
