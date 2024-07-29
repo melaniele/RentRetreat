@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { StatusBar } from "react-native";
 
 import Login from "./screens/Login";
 import Discover from "./screens/Discover";
@@ -27,15 +28,15 @@ const TabContainerComponent = () => (
       tabBarInactiveTintColor: "gray",
     })}
   >
-    <Tab.Screen name="Discover" component={Discover} 
-    options={{
-      headerShown: true,
-    }}
+    <Tab.Screen name="Discover" component={Discover}
+      options={{
+        headerShown: true,
+      }}
     />
-    <Tab.Screen name="My Reservations" component={MyReservations} 
-    options={{
-      headerShown: true,
-    }}
+    <Tab.Screen name="My Reservations" component={MyReservations}
+      options={{
+        headerShown: true,
+      }}
     />
   </Tab.Navigator>
 );
@@ -43,19 +44,20 @@ const TabContainerComponent = () => (
 export default function App() {
   return (
     <AuthProvider>
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Login"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen component={Login} name="Login" />
-        <Stack.Screen component={TabContainerComponent} name="Home" />
-        <Stack.Screen component={ConfirmReservation} name="Confirm Reservation"
-        options={{
-          headerShown: true,
-        }}/>
-      </Stack.Navigator>
-    </NavigationContainer>
+      <StatusBar barStyle="dark-content" />
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="Login"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen component={Login} name="Login" />
+          <Stack.Screen component={TabContainerComponent} name="Home" />
+          <Stack.Screen component={ConfirmReservation} name="Confirm Reservation"
+            options={{
+              headerShown: true,
+            }} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </AuthProvider>
   );
 }
