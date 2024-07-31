@@ -1,27 +1,39 @@
-import { useEffect, useRef, useState } from "react";
-import { Button, SafeAreaView, Text, View } from "react-native";
-import { useAuth } from "../components/AuthContext";
+import { useEffect, useRef, useState } from 'react';
+import {
+  Image,
+  Modal,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useAuth } from '../components/AuthContext';
 
-import * as Location from "expo-location";
-import MapView, { Marker } from "react-native-maps";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import * as Location from 'expo-location';
+import MapView, { Marker } from 'react-native-maps';
 
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { discoverStyles } from "../css/discoverStyles";
-import { db } from "../firebaseConfig";
+import { useIsFocused } from '@react-navigation/native';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { discoverStyles } from '../css/discoverStyles';
+import { db } from '../firebaseConfig';
 
 export default function Discover({ navigation, route }) {
   const { loggedInUserEmail } = useAuth();
   const mapRef = useRef(null);
+  const isUserOnThisScreen = useIsFocused();
   const [userLocation, setUserLocation] = useState(null);
   const [userCity, setUserCity] = useState(null);
   const [cityListings, setCityListings] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedListing, setSelectedListing] = useState(null);
 
   // On load:
   // 1 - Ask for location permission > fetch user current location
   useEffect(() => {
     requestLocationPermissions();
     getCurrentLocation();
-  }, []);
+  }, [useIsFocused]);
 
   // 2 - Fetch user's city (convert coords to city)
   useEffect(() => {
@@ -41,7 +53,7 @@ export default function Discover({ navigation, route }) {
   const requestLocationPermissions = async () => {
     try {
       const permissionObj = await Location.requestForegroundPermissionsAsync();
-      if (permissionObj.status == "granted") {
+      if (permissionObj.status == 'granted') {
         console.log("User's location permission granted!");
       } else {
         console.log("User's location permission denied");
@@ -74,8 +86,8 @@ export default function Discover({ navigation, route }) {
           console.error("MapView is null, can't show location on map");
         }
       } else {
-        console.error("No location found");
-        //TODO: set warning/error here
+        console.error('No location found');
+        alert('Sorry, no location found.');
       }
     } catch (error) {
       console.log(error);
@@ -92,7 +104,7 @@ export default function Discover({ navigation, route }) {
       const address = await Location.reverseGeocodeAsync(coords);
       const result = address[0];
       if (result === undefined) {
-        alert("No location found");
+        alert('No location found');
       } else {
         setUserCity(result.city);
       }
@@ -105,9 +117,9 @@ export default function Discover({ navigation, route }) {
   const getListingsInCity = async () => {
     try {
       const listingQuery = query(
-        collection(db, "listings"),
-        where("city", "==", userCity),
-        where("status", "==", "CONFIRMED")
+        collection(db, 'listings'),
+        where('city', '==', userCity),
+        where('status', '==', 'CONFIRMED')
       );
 
       const resultFromDB = [];
@@ -120,7 +132,6 @@ export default function Discover({ navigation, route }) {
         resultFromDB.push(listing);
       });
 
-      console.log(resultFromDB.length);
       setCityListings(resultFromDB);
     } catch (error) {
       console.error(error);
@@ -128,7 +139,8 @@ export default function Discover({ navigation, route }) {
   };
 
   const handleMarkerPress = (listing) => {
-    console.log({ listing });
+    setSelectedListing(listing);
+    setModalVisible(true);
   };
 
   return (
@@ -141,7 +153,11 @@ export default function Discover({ navigation, route }) {
           const longitude = parseFloat(listing.lng);
 
           if (isNaN(latitude) || isNaN(longitude)) {
-            console.error(`Invalid coordinates for listing ${listing.id}:`, listing.lat, listing.lng);
+            console.error(
+              `Invalid coordinates for listing ${listing.id}:`,
+              listing.lat,
+              listing.lng
+            );
             return null;
           }
 
@@ -156,24 +172,58 @@ export default function Discover({ navigation, route }) {
             >
               <View style={discoverStyles.priceMarker}>
                 <Text style={discoverStyles.priceMarkerText}>
-                  ${listing.pricePerNight}
+                  ${listing.pricePerNight} CAD
                 </Text>
               </View>
             </Marker>
           );
         })}
       </MapView>
-
-      {/*Temporary - Added so that we can navigate and see the Confirm Reservation screen  */}
-      <Button
-        title="Confirm Reservation"
-        onPress={() =>
-          navigation.navigate("Confirm Reservation", {
-            listingID: "jiSekHJ6RwbGOuNMMPZq",
-            renterEmail: route.params.email,
-          })
-        }
-      />
+      {selectedListing && (
+        <Modal animationType='slide' transparent={true} visible={modalVisible}>
+          <View style={discoverStyles.modalView}>
+            <Ionicons
+              name='close-circle'
+              size={24}
+              color='grey'
+              style={discoverStyles.modalCloseButton}
+              onPress={() => setModalVisible(false)}
+            />
+            <Image
+              source={{ uri: selectedListing.houseImage }}
+              style={discoverStyles.modalImage}
+            />
+            <Text style={discoverStyles.modalAddress}>
+              {`${selectedListing.address}, ${selectedListing.city}`}
+            </Text>
+            <Text style={discoverStyles.description}>
+              {selectedListing.description}
+            </Text>
+            <Text style={discoverStyles.modalPrice}>
+              ${selectedListing.pricePerNight} CAD night
+            </Text>
+            <Text style={discoverStyles.modalText}>
+              {`${selectedListing.noOfBeds} bed${
+                selectedListing.noOfBeds > 1 ? 's' : ''
+              }, ${selectedListing.noOfBathrooms} bath${
+                selectedListing.noOfBathrooms > 1 ? 's' : ''
+              }`}
+            </Text>
+            <TouchableOpacity
+              style={discoverStyles.button}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+                navigation.navigate('Confirm Reservation', {
+                  listingID: selectedListing.id,
+                  renterEmail: route.params.email,
+                });
+              }}
+            >
+              <Text style={discoverStyles.buttonText}>Confirm Reservation</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }

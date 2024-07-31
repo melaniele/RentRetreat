@@ -7,23 +7,21 @@ export const discoverStyles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  userMarker: {
-    backgroundColor: "blue",
-    padding: 5,
-    borderRadius: 5,
-  },
-  userMarkerText: {
-    color: "white",
-  },
   priceMarker: {
-    backgroundColor: "red",
-    padding: 5,
-    borderRadius: 5,
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 20,
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+
   },
   priceMarkerText: {
-    color: "white",
+    color: "black",
+    fontWeight: 'bold'
   },
   modalView: {
+    marginTop: 200,
     margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
@@ -35,21 +33,38 @@ export const discoverStyles = StyleSheet.create({
       height: 2,
     },
     shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowRadius: 10,
+    elevation: 10,
   },
-  modalTitle: {
-    fontSize: 24,
+  modalCloseButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+  },
+  modalAddress: {
+    fontSize: 20,
     fontWeight: "bold",
+    textAlign: "center",
+    padding: 5
+  },
+  description:{
+    fontSize: 15,
+    padding: 5
   },
   modalImage: {
-    width: 200,
+    width: 300,
     height: 200,
     marginVertical: 10,
+    borderRadius: 10,
+    padding: 5
+
   },
   modalPrice: {
     fontSize: 20,
     color: "green",
+    padding: 5,
+    fontWeight: "bold"
+
   },
   modalText: {
     fontSize: 16,
