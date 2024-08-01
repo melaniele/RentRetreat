@@ -61,7 +61,12 @@ export default function ConfirmReservation({ route }) {
     useState(false);
   const [ownerInfo, setOwnerInfo] = useState({});
 
+  // This is the minimum date that a user can select for the check-in date.
+  // By default, it is set to the current date.
+  // This is only a temporary implementation as the requirements specify that a user cannot choose their dates.
+  // So, the availableStartDate will be set to the first available date based on how many users have already reserved the listing.
   const [selectedFromDate, setSelectedFromDate] = useState(new Date());
+
   // sets selectedToDate to be the next day by default
   const [selectedToDate, setSelectedToDate] = useState(
     new Date(new Date().setDate(new Date().getDate() + 1))
@@ -115,7 +120,7 @@ export default function ConfirmReservation({ route }) {
     };
 
     // Insert the reservation request into the database
-    console.log('Adding reservation request to the database');
+    // console.log('Adding reservation request to the database');
     try {
       setReservationConfirmIsLoading(true);
       const docRef = await addDoc(
@@ -124,7 +129,7 @@ export default function ConfirmReservation({ route }) {
       );
       setReservationConfirmIsLoading(false);
 
-      console.log('Document written with ID: ', docRef.id);
+      // console.log('Document written with ID: ', docRef.id);
       Alert.alert(
         'Reservation Confirmed',
         'Your reservation has been confirmed. Your confirmation ID is: ' +
@@ -154,6 +159,8 @@ export default function ConfirmReservation({ route }) {
       if (docSnap.exists()) {
         // console.log("Document data:", docSnap.data());
         setListingInfo(docSnap.data());
+
+        fetchAmountOfReservationsForMinimumDate();
 
         // Check if the user has a reservation for this listing
         checkIfUserHasReservation();
@@ -211,6 +218,27 @@ export default function ConfirmReservation({ route }) {
     }
   };
 
+  fetchAmountOfReservationsForMinimumDate = async () => {
+    const reservationQuery = query(
+      collection(db, 'reservationRequests'),
+      where('listingID', '==', route.params.listingID)
+    );
+
+    const querySnapshot = await getDocs(reservationQuery);
+
+    
+    // If there are no results, then no one has the a reservation and the date will be set to the current date.
+    // Simply return as the default values are already proper.
+    if (querySnapshot.empty) {
+      return;
+    }
+
+    // Get length of querySnapshot
+    const amountOfReservations = querySnapshot.size;
+    // console.log('Amount of reservations: ', amountOfReservations);
+    setSelectedFromDate(new Date(new Date().setDate(new Date().getDate() + amountOfReservations)));
+    setSelectedToDate(new Date(new Date().setDate(new Date().getDate() + amountOfReservations + 1)));
+  }
   return (
     <View style={[styles.container]}>
       <ScrollView>
@@ -269,7 +297,12 @@ export default function ConfirmReservation({ route }) {
                 mode='date'
                 display='default'
                 onChange={handleFromDateChange}
-                minimumDate={new Date()}
+
+                // Typically, the minimum date should be the current date.
+                // However, the requirements specify that a user cannot choose their dates and the implementation
+                // Simply takes the first available date based on how many users have already reserved the listing.
+                minimumDate={selectedFromDate}
+
                 // Maximum added as the requirements specify that a user cannot choose their dates.
                 maximumDate={new Date()}
                 value={selectedFromDate}
