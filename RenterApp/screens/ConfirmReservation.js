@@ -218,7 +218,7 @@ export default function ConfirmReservation({ route }) {
     }
   };
 
-  fetchAmountOfReservationsForMinimumDate = async () => {
+  const fetchAmountOfReservationsForMinimumDate = async () => {
     const reservationQuery = query(
       collection(db, 'reservationRequests'),
       where('listingID', '==', route.params.listingID)
