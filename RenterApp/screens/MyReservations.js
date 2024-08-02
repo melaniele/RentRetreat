@@ -86,12 +86,12 @@ export default function MyReservations({ navigation }) {
 
   const getDataFromDB = async () => {
     setIsLoading(true);
-    const listings = []
+    const reservationRequests = [];
     try {
       const q = query(collection(db, "reservationRequests"), where("renterEmail", "==", loggedInUserEmail))
       const querySnapshot = await getDocs(q)
       querySnapshot.forEach((doc) => {
-        listings.push({
+        reservationRequests.push({
           listingID: doc.data().listingID,
           ownerEmail: doc.data().ownerEmail,
           reservationRequestID: doc.id,
@@ -109,7 +109,7 @@ export default function MyReservations({ navigation }) {
 
     try {
       let updatedReservedListings = await Promise.all(
-        listings.map(async (reservedListing) => {
+        reservationRequests.map(async (reservedListing) => {
           const listingsRef = query(collection(db, 'listings'), where("city", "==", userCityLocation));
           const querySnapshot = await getDocs(listingsRef);
           querySnapshot.forEach((doc) => {
