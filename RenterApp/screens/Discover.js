@@ -19,7 +19,7 @@ import { discoverStyles } from '../css/discoverStyles';
 import { db } from '../firebaseConfig';
 
 export default function Discover({ navigation, route }) {
-  const { loggedInUserEmail } = useAuth();
+  const { loggedInUserEmail, setUserCityLocation} = useAuth();
   const mapRef = useRef(null);
   const isUserOnThisScreen = useIsFocused();
   const [userLocation, setUserLocation] = useState(null);
@@ -107,6 +107,7 @@ export default function Discover({ navigation, route }) {
         alert('No location found');
       } else {
         setUserCity(result.city);
+        setUserCityLocation(result.city);
       }
     } catch (error) {
       console.error(error);

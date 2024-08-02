@@ -9,13 +9,15 @@ import HouseInfo from "../components/HouseInfo";
 import UserInfo from "../components/UserInfo";
 
 export default function MyReservations() {
-  const { loggedInUserEmail } = useAuth();
+  const { loggedInUserEmail, userCityLocation } = useAuth();
+  
   const [reservationList, setReservationList] = useState([])
   const [isRefreshing, setIsRefreshing] = useState(false)
   const isUserOnThisScreen = useIsFocused()
 
   useEffect(() => {
     if (isUserOnThisScreen) {
+      console.log(userCityLocation)
       getDataFromDB()
     }
   }, [isUserOnThisScreen])
@@ -48,9 +50,10 @@ export default function MyReservations() {
     try {
       const updatedReservedListings = await Promise.all(
         listings.map(async (reservedListing) => {
-          const listingsRef = collection(db, 'listings');
+          const listingsRef = query(collection(db, 'listings'), where("city", "==", userCityLocation));
           const querySnapshot = await getDocs(listingsRef);
           querySnapshot.forEach((doc) => {
+            console.log(doc.data().ownerEmail, reservedListing.ownerEmail, doc.id, reservedListing.listingID)
             if (
               doc.data().ownerEmail === reservedListing.ownerEmail &&
               doc.id === reservedListing.listingID
