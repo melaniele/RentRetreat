@@ -1,4 +1,11 @@
-import { Text, View, FlatList, TouchableOpacity, Alert } from "react-native";
+import {
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { useAuth } from "../components/AuthContext";
 import { useEffect, useState } from "react"
 import { useIsFocused, StackActions } from "@react-navigation/native"
@@ -16,6 +23,7 @@ export default function MyReservations({ navigation }) {
   const [reservationList, setReservationList] = useState([])
   const [isRefreshing, setIsRefreshing] = useState(false)
   const isUserOnThisScreen = useIsFocused()
+  const [isLoading, setIsLoading] = useState(true);
 
   const logoutPressed = async () => {
     try {
@@ -77,6 +85,7 @@ export default function MyReservations({ navigation }) {
   }
 
   const getDataFromDB = async () => {
+    setIsLoading(true);
     const listings = []
     try {
       const q = query(collection(db, "reservationRequests"), where("renterEmail", "==", loggedInUserEmail))
@@ -94,6 +103,8 @@ export default function MyReservations({ navigation }) {
         'Error getting documents from reservationRequests db: ',
         error
       );
+      setIsLoading(false);
+      return;
     }
 
     try {
@@ -152,6 +163,7 @@ export default function MyReservations({ navigation }) {
       );
     }
     setIsRefreshing(false)
+    setIsLoading(false);
   }
 
   const renderListings = ({ item }) => {
@@ -217,14 +229,36 @@ export default function MyReservations({ navigation }) {
 
   return (
     <View style={myReservationsStyles.container}>
-      <FlatList
-        onRefresh={onRefresh}
-        refreshing={isRefreshing}
-        style={myReservationsStyles.reservedListingsList}
-        data={reservationList}
-        renderItem={renderListings}
-        keyExtractor={(item) => item.reservationRequestID}
-      />
+      {isLoading ? (
+        <ActivityIndicator
+          size='large'
+          color='#0000ff'
+          animating={true}
+          style={{ marginTop: 20 }}
+        />
+      ) : reservationList.length === 0 ? (
+        <Text
+          style={{
+            fontSize: 20,
+            paddingBottom: 10,
+            color: '#6ab04c',
+            fontWeight: 'bold',
+            marginHorizontal: 20,
+          }}
+        >
+          No listings found! Either you have no reservations or the listings you
+          have reserved are not in your city: {userCityLocation}.
+        </Text>
+      ) : (
+        <FlatList
+          onRefresh={onRefresh}
+          refreshing={isRefreshing}
+          style={myReservationsStyles.reservedListingsList}
+          data={reservationList}
+          renderItem={renderListings}
+          keyExtractor={(item) => item.reservationRequestID}
+        />
+      )}
     </View>
   );
 }
