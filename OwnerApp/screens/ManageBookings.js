@@ -1,25 +1,20 @@
-import React from 'react';
-import { useState, useEffect, useContext } from 'react';
-
+import { StackActions, useIsFocused } from "@react-navigation/native";
+import { signOut } from "firebase/auth";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
   ActivityIndicator,
-  TouchableOpacity,
   Alert,
-  FlatList
-} from 'react-native';
-
-import { db, auth } from '../firebaseConfig';
-import { useIsFocused, StackActions } from '@react-navigation/native';
-import { useAuth } from '../store/AuthContext';
-import HouseInfo from '../components/HouseInfo';
-import UserInfo from '../components/UserInfo';
-import { manageBookingsStyles } from '../css/manageBookingStyles';
-
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import HouseInfo from "../components/HouseInfo";
+import UserInfo from "../components/UserInfo";
+import { manageBookingsStyles } from "../css/manageBookingStyles";
+import { auth, db } from "../firebaseConfig";
+import { useAuth } from "../store/AuthContext";
 
 export default function ManageBookings({ navigation }) {
   const [reservedListings, setReservedListings] = useState([]);
@@ -31,11 +26,11 @@ export default function ManageBookings({ navigation }) {
     try {
       await signOut(auth);
       navigation.dispatch(StackActions.popToTop());
-      console.log('user has been logged out');
+      console.log("user has been logged out");
     } catch (error) {
       console.error(`error logging out: ${error}`);
       Alert.alert(
-        'Error logging out',
+        "Error logging out",
         `There was an error logging out: ${error}`
       );
     }
@@ -51,20 +46,20 @@ export default function ManageBookings({ navigation }) {
           style={{
             ...manageBookingsStyles.header,
             marginLeft: 15,
-            backgroundColor: '#fa8231',
-            padding: 5
+            backgroundColor: "#fa8231",
+            padding: 5,
           }}
         >
           <Text
             style={{
               fontSize: 18,
-              color: 'black'
+              color: "black",
             }}
           >
             Sign Out
           </Text>
         </TouchableOpacity>
-      )
+      ),
     });
   };
 
@@ -74,41 +69,41 @@ export default function ManageBookings({ navigation }) {
 
   const cancelReservationRequest = async (reservationRequestID, listingID) => {
     Alert.alert(
-      'Cancel Request',
-      'Are you sure you want to cancel this reservation request?',
+      "Cancel Request",
+      "Are you sure you want to cancel this reservation request?",
       [
         {
-          text: 'Yes',
+          text: "Yes",
           onPress: async () => {
             try {
               setIsLoading(true);
               const reservationRequestRef = doc(
                 db,
-                'reservationRequests',
+                "reservationRequests",
                 reservationRequestID
               );
               await updateDoc(reservationRequestRef, {
-                status: 'CANCELLED'
+                status: "CANCELLED",
               });
 
-              const listingRef = doc(db, 'listings', listingID);
+              const listingRef = doc(db, "listings", listingID);
               await updateDoc(listingRef, {
-                status: 'CANCELLED'
+                status: "CANCELLED",
               });
 
               getListings();
             } catch (error) {
-              console.error('Error cancelling reservation request: ', error);
+              console.error("Error cancelling reservation request: ", error);
               setIsLoading(false);
             }
-          }
+          },
         },
         {
-          text: 'No',
+          text: "No",
           onPress: () => {
             // Do nothing
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -120,7 +115,7 @@ export default function ManageBookings({ navigation }) {
       const reservedListings = [];
 
       try {
-        const reservationRequestsRef = collection(db, 'reservationRequests');
+        const reservationRequestsRef = collection(db, "reservationRequests");
         const querySnapshot = await getDocs(reservationRequestsRef);
         querySnapshot.forEach((doc) => {
           if (doc.data().ownerEmail === loggedInUserEmail) {
@@ -128,13 +123,13 @@ export default function ManageBookings({ navigation }) {
               listingID: doc.data().listingID,
               renterEmail: doc.data().renterEmail,
               reservationRequestID: doc.id,
-              status: doc.data().status
+              status: doc.data().status,
             });
           }
         });
       } catch (error) {
         console.error(
-          'Error getting documents from reservationRequests db: ',
+          "Error getting documents from reservationRequests db: ",
           error
         );
         setIsLoading(false);
@@ -144,7 +139,7 @@ export default function ManageBookings({ navigation }) {
       try {
         const updatedReservedListings = await Promise.all(
           reservedListings.map(async (reservedListing) => {
-            const listingsRef = collection(db, 'listings');
+            const listingsRef = collection(db, "listings");
             const querySnapshot = await getDocs(listingsRef);
             querySnapshot.forEach((doc) => {
               if (
@@ -163,16 +158,16 @@ export default function ManageBookings({ navigation }) {
                   noOfBeds: doc.data().noOfBeds,
                   noOfGuests: doc.data().noOfGuests,
                   pricePerNight: doc.data().pricePerNight,
-                  ownerEmail: doc.data().ownerEmail
+                  ownerEmail: doc.data().ownerEmail,
                 });
               }
             });
 
-            const usersRef = collection(db, 'users');
+            const usersRef = collection(db, "users");
             const querySnapshotUsers = await getDocs(usersRef);
             querySnapshotUsers.forEach((doc) => {
               if (
-                doc.data().userType === 'renter' &&
+                doc.data().userType === "renter" &&
                 doc.data().email === reservedListing.renterEmail
               ) {
                 Object.assign(reservedListing, {
@@ -180,7 +175,7 @@ export default function ManageBookings({ navigation }) {
                   firstname: doc.data().firstname,
                   lastname: doc.data().lastname,
                   picture: doc.data().picture,
-                  userType: doc.data().userType
+                  userType: doc.data().userType,
                 });
               }
             });
@@ -192,7 +187,7 @@ export default function ManageBookings({ navigation }) {
         setReservedListings(updatedReservedListings);
       } catch (error) {
         console.error(
-          'Error getting documents from listings/users db: ',
+          "Error getting documents from listings/users db: ",
           error
         );
       }
@@ -225,25 +220,25 @@ export default function ManageBookings({ navigation }) {
           />
           <View
             style={{
-              flexDirection: 'row'
+              flexDirection: "row",
             }}
           >
             <View
               style={{
                 ...manageBookingsStyles.statusAndConfirmationContainer,
-                paddingRight: 10
+                paddingRight: 10,
               }}
             >
               <Text>Status</Text>
               <Text
                 style={{
-                  fontWeight: 'bold',
+                  fontWeight: "bold",
                   color:
-                    item.status.toUpperCase() === 'CANCELLED'
-                      ? 'red'
-                      : item.status.toUpperCase() === 'CONFIRMED'
-                      ? 'green'
-                      : 'black'
+                    item.status.toUpperCase() === "CANCELLED"
+                      ? "red"
+                      : item.status.toUpperCase() === "CONFIRMED"
+                      ? "green"
+                      : "black",
                 }}
               >
                 {item.status.toUpperCase()}
@@ -253,11 +248,11 @@ export default function ManageBookings({ navigation }) {
             <View
               style={{
                 ...manageBookingsStyles.statusAndConfirmationContainer,
-                paddingLeft: 10
+                paddingLeft: 10,
               }}
             >
               <Text>Confirmation Code</Text>
-              <Text style={{ fontWeight: 'bold' }}>
+              <Text style={{ fontWeight: "bold" }}>
                 {item.reservationRequestID}
               </Text>
             </View>
