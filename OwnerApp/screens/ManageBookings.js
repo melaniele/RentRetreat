@@ -273,7 +273,7 @@ export default function ManageBookings({ navigation }) {
         />
       ) : reservedListings.length === 0 ? (
         <Text style={manageBookingsStyles.noListingsFound}>
-          No listings found!
+          None of your listings have been reserved by a Renter yet!
         </Text>
       ) : (
         <FlatList
