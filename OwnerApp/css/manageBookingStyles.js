@@ -27,7 +27,8 @@ export const manageBookingsStyles = StyleSheet.create({
     fontSize: 20,
     paddingBottom: 10,
     color: '#6ab04c',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    marginHorizontal: 20,
   },
   header: {
     backgroundColor: '#2C3A47',

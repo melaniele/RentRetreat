@@ -7,6 +7,7 @@ export const myReservationsStyles = StyleSheet.create({
     padding: 30,
   },
   container: {
+    flex: 1,
     width: "100%",
     alignItems: 'center',
     justifyContent: 'center'

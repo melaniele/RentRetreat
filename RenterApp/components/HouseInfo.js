@@ -60,13 +60,14 @@ import {
   const styles = StyleSheet.create({
     houseImage: {
       width: "100%",
-      height: 200,
+      height: 190,
       resizeMode: "center",
       borderRadius: 15,
     },
     locationText: {
       fontWeight: "bold",
       fontSize: 16,
+      marginTop: 5,
     },
     overlay: {
       position: "absolute",
