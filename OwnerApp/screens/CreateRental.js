@@ -22,6 +22,8 @@ import isUserInputValid from '../utils/validateUserInput.js';
 import { createRentalStyles } from '../css/createRentalStyles.js';
 import { loginStyles } from '../css/loginStyles.js';
 import { useAuth } from '../store/AuthContext';
+import LogoutButton
+ from '../components/LogoutButton.js';
 
 export default function CreateRental({ navigation }) {
   const isUserOnThisScreen = useIsFocused();
@@ -63,42 +65,9 @@ export default function CreateRental({ navigation }) {
   const setHeader = () => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => {
-            logoutPressed();
-          }}
-          style={{
-            ...loginStyles.header,
-            marginLeft: 15,
-            backgroundColor: '#fa8231',
-            padding: 7
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              color: 'black'
-            }}
-          >
-            Sign Out
-          </Text>
-        </TouchableOpacity>
+        <LogoutButton />
       )
     });
-  };
-
-  const logoutPressed = async () => {
-    try {
-      await signOut(auth);
-      navigation.dispatch(StackActions.popToTop());
-      console.log('user has been logged out');
-    } catch (error) {
-      console.log(`error logging out: ${error}`);
-      Alert.alert(
-        'Error logging out',
-        `There was an error logging out: ${error}`
-      );
-    }
   };
 
   const requestLocationPermissions = async () => {
