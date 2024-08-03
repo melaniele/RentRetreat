@@ -2,21 +2,18 @@ import {
   Text,
   View,
   FlatList,
-  TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { useAuth } from "../components/AuthContext";
 import { useEffect, useState } from "react"
-import { useIsFocused, StackActions } from "@react-navigation/native"
-import { db, auth } from '../firebaseConfig';
+import { useIsFocused } from "@react-navigation/native"
+import { db } from '../firebaseConfig';
 
 import { collection, getDocs, where, query } from "firebase/firestore"
 import { myReservationsStyles } from '../css/myReservationsStyles';
 import HouseInfo from "../components/HouseInfo";
-import { signOut } from 'firebase/auth';
 import UserInfo from "../components/UserInfo";
-
+import LogoutButton from '../components/LogoutButton';
 export default function MyReservations({ navigation }) {
   const { loggedInUserEmail, userCityLocation } = useAuth();
 
@@ -25,49 +22,10 @@ export default function MyReservations({ navigation }) {
   const isUserOnThisScreen = useIsFocused()
   const [isLoading, setIsLoading] = useState(true);
 
-  const logoutPressed = async () => {
-    try {
-      await signOut(auth);
-      navigation.dispatch(StackActions.popToTop());
-    } catch (error) {
-      console.log(`error logging out: ${error}`);
-      Alert.alert(
-        'Error logging out',
-        `There was an error logging out: ${error}`
-      );
-    }
-  };
-
   const setHeader = () => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => {
-            logoutPressed();
-          }}
-          style={{
-            backgroundColor: '#2C3A47',
-            borderRadius: 5,
-            marginRight: 15,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 0,
-            padding: 5,
-            marginLeft: 15,
-            backgroundColor: '#fa8231',
-            padding: 7
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              color: 'black'
-            }}
-          >
-            Sign Out
-          </Text>
-        </TouchableOpacity>
+        <LogoutButton />
       )
     });
   };

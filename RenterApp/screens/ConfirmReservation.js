@@ -20,13 +20,13 @@ import {
   getDocs,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-
 import HouseInfo from '../components/HouseInfo';
 import AmenitiesItem from '../components/AmenitiesItem';
 import RNDateTimePicker, {
   DateTimePicker,
 } from '@react-native-community/datetimepicker';
 import { useAuth } from '../components/AuthContext';
+import LogoutButton from '../components/LogoutButton';
 
 const SAMPLE_LISTING = {
   address: '223 Sheppard Ave W',
@@ -53,13 +53,21 @@ const SAMPLE_OWNER = {
   userType: 'owner',
 };
 
-export default function ConfirmReservation({ route }) {
+export default function ConfirmReservation({ route, navigation }) {
   const { loggedInUserEmail } = useAuth();
   const [listingInfo, setListingInfo] = useState({});
   const [userHasReservation, setUserHasReservation] = useState(false);
   const [reservationConfirmIsLoading, setReservationConfirmIsLoading] =
     useState(false);
   const [ownerInfo, setOwnerInfo] = useState({});
+
+  const setHeader = () => {
+    navigation.setOptions({
+      headerRight: () => (
+        <LogoutButton />
+      )
+    });
+  };
 
   // This is the minimum date that a user can select for the check-in date.
   // By default, it is set to the current date.
@@ -144,6 +152,7 @@ export default function ConfirmReservation({ route }) {
 
   useEffect(() => {
     console.log('Logged in user email: ', loggedInUserEmail);
+    setHeader();
     fetchListingInfo();
     console.log(route.params.renterEmail);
     // For testing purposes
