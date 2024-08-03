@@ -15,6 +15,8 @@ import UserInfo from "../components/UserInfo";
 import { manageBookingsStyles } from "../css/manageBookingStyles";
 import { auth, db } from "../firebaseConfig";
 import { useAuth } from "../store/AuthContext";
+import LogoutButton
+ from "../components/LogoutButton";
 
 export default function ManageBookings({ navigation }) {
   const [reservedListings, setReservedListings] = useState([]);
@@ -39,26 +41,7 @@ export default function ManageBookings({ navigation }) {
   const setHeader = () => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => {
-            logoutPressed();
-          }}
-          style={{
-            ...manageBookingsStyles.header,
-            marginLeft: 15,
-            backgroundColor: "#fa8231",
-            padding: 5,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              color: "black",
-            }}
-          >
-            Sign Out
-          </Text>
-        </TouchableOpacity>
+        <LogoutButton />
       ),
     });
   };

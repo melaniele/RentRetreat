@@ -17,7 +17,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { discoverStyles } from '../css/discoverStyles';
 import { db } from '../firebaseConfig';
-
+import LogoutButton from '../components/LogoutButton';
 export default function Discover({ navigation, route }) {
   const { loggedInUserEmail, setUserCityLocation} = useAuth();
   const mapRef = useRef(null);
@@ -28,9 +28,18 @@ export default function Discover({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
 
+  const setHeader = () => {
+    navigation.setOptions({
+      headerRight: () => (
+        <LogoutButton />
+      )
+    });
+  };
+
   // On load:
   // 1 - Ask for location permission > fetch user current location
   useEffect(() => {
+    setHeader();
     requestLocationPermissions();
     getCurrentLocation();
   }, [useIsFocused]);
