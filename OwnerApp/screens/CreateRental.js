@@ -36,9 +36,6 @@ export default function CreateRental({ navigation }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [lat, setLat] = useState('-33.8568');
-  const [lng, setLng] = useState('151.2153');
-
   const [city, onChangeCity] = React.useState('Toronto');
   const [address, onChangeAddress] = React.useState('1750 Finch Avenue East');
 
@@ -89,13 +86,12 @@ export default function CreateRental({ navigation }) {
 
       //first location is the most accurate
       const result = geocodedLocation[0];
+      // console.log(result);
       if (result === undefined) {
         return false;
       }
 
-      setLat(result.latitude);
-      setLng(result.longitude);
-      return true;
+      return {latitude: result.latitude, longitude: result.longitude};
     } catch (err) {
       console.log(err);
       return false;
@@ -145,7 +141,8 @@ export default function CreateRental({ navigation }) {
       console.error('Error getting documents from homes: ', error);
     }
 
-    if (forwardGeocodingSucceeded()) {
+    const geocodingResults = await forwardGeocodingSucceeded();
+    if (geocodingResults !== false) {
       try {
         const listingsRef = collection(db, 'listings');
         await addDoc(listingsRef, {
@@ -159,8 +156,8 @@ export default function CreateRental({ navigation }) {
           amenities,
           city,
           address,
-          lat: lat,
-          lng: lng,
+          lat: geocodingResults.latitude,
+          lng: geocodingResults.longitude,
           ownerEmail: loggedInUserEmail,
         });
         alert('Rental created!');
