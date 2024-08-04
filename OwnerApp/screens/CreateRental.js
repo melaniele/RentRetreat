@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
-  Alert
+  Alert,
 } from 'react-native';
 import * as Location from 'expo-location';
 import { useIsFocused, StackActions } from '@react-navigation/native';
@@ -22,8 +22,7 @@ import isUserInputValid from '../utils/validateUserInput.js';
 import { createRentalStyles } from '../css/createRentalStyles.js';
 import { loginStyles } from '../css/loginStyles.js';
 import { useAuth } from '../store/AuthContext';
-import LogoutButton
- from '../components/LogoutButton.js';
+import LogoutButton from '../components/LogoutButton.js';
 
 export default function CreateRental({ navigation }) {
   const isUserOnThisScreen = useIsFocused();
@@ -36,9 +35,6 @@ export default function CreateRental({ navigation }) {
   const { loggedInUserEmail } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
-
-  const [lat, setLat] = useState('-33.8568');
-  const [lng, setLng] = useState('151.2153');
 
   const [city, onChangeCity] = React.useState('Toronto');
   const [address, onChangeAddress] = React.useState('1750 Finch Avenue East');
@@ -64,9 +60,7 @@ export default function CreateRental({ navigation }) {
 
   const setHeader = () => {
     navigation.setOptions({
-      headerRight: () => (
-        <LogoutButton />
-      )
+      headerRight: () => <LogoutButton />,
     });
   };
 
@@ -92,13 +86,12 @@ export default function CreateRental({ navigation }) {
 
       //first location is the most accurate
       const result = geocodedLocation[0];
+      // console.log(result);
       if (result === undefined) {
         return false;
       }
 
-      setLat(result.latitude);
-      setLng(result.longitude);
-      return true;
+      return {latitude: result.latitude, longitude: result.longitude};
     } catch (err) {
       console.log(err);
       return false;
@@ -148,7 +141,8 @@ export default function CreateRental({ navigation }) {
       console.error('Error getting documents from homes: ', error);
     }
 
-    if (forwardGeocodingSucceeded()) {
+    const geocodingResults = await forwardGeocodingSucceeded();
+    if (geocodingResults !== false) {
       try {
         const listingsRef = collection(db, 'listings');
         await addDoc(listingsRef, {
@@ -162,9 +156,9 @@ export default function CreateRental({ navigation }) {
           amenities,
           city,
           address,
-          lat: lat,
-          lng: lng,
-          ownerEmail: loggedInUserEmail
+          lat: geocodingResults.latitude,
+          lng: geocodingResults.longitude,
+          ownerEmail: loggedInUserEmail,
         });
         alert('Rental created!');
       } catch (error) {
@@ -178,140 +172,139 @@ export default function CreateRental({ navigation }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={createRentalStyles.container}>
-      {isLoading ? (
-        <ActivityIndicator
-          size="large"
-          color="#0000ff"
-        />
-      ) : (
-        <>
-          <View style={createRentalStyles.inputContainer}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={createRentalStyles.text}>Address </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
-                *
-              </Text>
-            </View>
-            <TextInput
-              style={{
-                ...createRentalStyles.input,
-                width: 200,
-                padding: 10
-              }}
-              placeholder="1750 Finch Avenue East"
-              onChangeText={onChangeAddress}
-              value={address}
-            />
-          </View>
-          <View style={createRentalStyles.inputContainer}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={createRentalStyles.text}>City </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
-                *
-              </Text>
-            </View>
-            <TextInput
-              style={{
-                ...createRentalStyles.input,
-                width: 200,
-                padding: 10
-              }}
-              placeholder="Toronto"
-              onChangeText={onChangeCity}
-              value={city}
-            />
-          </View>
-          <View style={createRentalStyles.inputContainer}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={createRentalStyles.text}>No of Beds </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
-                *
-              </Text>
-            </View>
-            <TextInput
-              style={createRentalStyles.input}
-              placeholder="3"
-              keyboardType="numeric"
-              onChangeText={onChangeBeds}
-              value={noOfBeds}
-            />
-          </View>
-          <View style={createRentalStyles.inputContainer}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={createRentalStyles.text}>No of Bathrooms </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
-                *
-              </Text>
-            </View>
-            <TextInput
-              style={createRentalStyles.input}
-              placeholder="2"
-              keyboardType="numeric"
-              onChangeText={onChangeBathrooms}
-              value={noOfBathrooms}
-            />
-          </View>
-          <View style={createRentalStyles.inputContainer}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={createRentalStyles.text}>No of Guests </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
-                *
-              </Text>
-            </View>
-            <TextInput
-              style={createRentalStyles.input}
-              placeholder="5"
-              keyboardType="numeric"
-              onChangeText={onChangeGuests}
-              value={noOfGuests}
-            />
-          </View>
-          <View style={createRentalStyles.inputContainer}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={createRentalStyles.text}>Description </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
-                *
-              </Text>
-            </View>
-            <TextInput
-              style={{
-                ...createRentalStyles.input,
-                width: 200,
-                height: 200,
-                padding: 10
-              }}
-              placeholder="Experience the best stay of your life! Our home is located in the heart of the city, close to all the major attractions."
-              onChangeText={onChangeDescription}
-              value={description}
-              multiline={true}
-            />
-          </View>
-          <View style={createRentalStyles.inputContainer}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={createRentalStyles.text}>Price per Night </Text>
-              <Text style={{ ...createRentalStyles.text, color: 'red' }}>
-                *
-              </Text>
-            </View>
-            <TextInput
-              style={createRentalStyles.input}
-              placeholder="$50"
-              keyboardType="numeric"
-              onChangeText={onChangePrice}
-              value={price}
-            />
-          </View>
-          <TouchableOpacity
-            style={createRentalStyles.pressable}
-            onPress={createRental}
-          >
-            <Text style={createRentalStyles.createRentalText}>
-              Create Rental
-            </Text>
-          </TouchableOpacity>
-        </>
-      )}
-    </ScrollView>
+    <>
+      <View
+        style={[
+          {
+            backgroundColor: '#FAFAFA',
+            flex: 1,
+          },
+        ]}
+      >
+        <ScrollView  contentContainerStyle={{paddingHorizontal: 35, paddingBottom: 30}}>
+          {isLoading ? (
+            <ActivityIndicator size='large' color='#0000ff' />
+          ) : (
+            <>
+              {/* Location */}
+              <View style={[{ marginTop: 10 }]}>
+                <View style={[createRentalStyles.fullWidth]}>
+                  <Text style={[createRentalStyles.sectionHeaderText]}>
+                    Location
+                  </Text>
+                  <View
+                    style={[createRentalStyles.sectionHeaderDivider]}
+                  ></View>
+                </View>
+                <View style={[createRentalStyles.fullWidth]}>
+                  <Text style={[createRentalStyles.inputHeaderText]}>
+                    Address
+                  </Text>
+                  <TextInput
+                    style={[createRentalStyles.textInput]}
+                    placeholder='1750 Finch Avenue East'
+                    onChangeText={onChangeAddress}
+                    value={address}
+                  />
+                </View>
+
+                <View style={[createRentalStyles.fullWidth, { marginTop: 10 }]}>
+                  <Text style={[createRentalStyles.inputHeaderText]}>City</Text>
+                  <TextInput
+                    style={[createRentalStyles.textInput]}
+                    placeholder='Toronto'
+                    onChangeText={onChangeCity}
+                    value={city}
+                  />
+                </View>
+              </View>
+
+              {/* Accomodation Details */}
+              <View style={[{ marginTop: 25 }]}>
+                <View style={[createRentalStyles.fullWidth]}>
+                  <Text style={[createRentalStyles.sectionHeaderText]}>
+                    Accomodation Details
+                  </Text>
+                  <View
+                    style={[createRentalStyles.sectionHeaderDivider]}
+                  ></View>
+                </View>
+
+                <View style={[createRentalStyles.fullWidth, { marginTop: 10 }]}>
+                  <Text style={[createRentalStyles.inputHeaderText]}>
+                    Amount of Beds
+                  </Text>
+                  <TextInput
+                    style={[createRentalStyles.textInput]}
+                    placeholder='3'
+                    keyboardType='numeric'
+                    onChangeText={onChangeBeds}
+                    value={noOfBeds}
+                  />
+                </View>
+
+                <View style={[createRentalStyles.fullWidth, { marginTop: 10 }]}>
+                  <Text style={[createRentalStyles.inputHeaderText]}>
+                    Amount of Bathrooms
+                  </Text>
+                  <TextInput
+                    style={[createRentalStyles.textInput]}
+                    placeholder='2'
+                    keyboardType='numeric'
+                    onChangeText={onChangeBathrooms}
+                    value={noOfBathrooms}
+                  />
+                </View>
+
+                <View style={[createRentalStyles.fullWidth, { marginTop: 10 }]}>
+                  <Text style={[createRentalStyles.inputHeaderText]}>
+                    Amount of Guests
+                  </Text>
+                  <TextInput
+                    style={[createRentalStyles.textInput]}
+                    placeholder='5'
+                    keyboardType='numeric'
+                    onChangeText={onChangeGuests}
+                    value={noOfGuests}
+                  />
+                </View>
+
+                <View style={[createRentalStyles.fullWidth, { marginTop: 10 }]}>
+                  <Text style={[createRentalStyles.inputHeaderText]}>
+                    Description
+                  </Text>
+                  <TextInput
+                    style={[createRentalStyles.textInput, { height: 150 }]}
+                    placeholder='Experience the best stay of your life! Our home is located in the heart of the city, close to all the major attractions.'
+                    onChangeText={onChangeDescription}
+                    value={description}
+                    multiline={true}
+                  />
+                </View>
+
+                <View style={[createRentalStyles.fullWidth, { marginTop: 10 }]}>
+                  <Text style={[createRentalStyles.inputHeaderText]}>
+                    Price per night
+                  </Text>
+                  <TextInput
+                    style={[createRentalStyles.textInput]}
+                    placeholder='$50'
+                    keyboardType='numeric'
+                    onChangeText={onChangePrice}
+                    value={price}
+                  />
+                </View>
+              </View>
+              <TouchableOpacity
+                style={createRentalStyles.button}
+                onPress={createRental}
+              >
+                <Text style={createRentalStyles.buttonText}>Create Rental</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </ScrollView>
+      </View>
+    </>
   );
 }

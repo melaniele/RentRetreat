@@ -248,6 +248,14 @@ export default function ConfirmReservation({ route, navigation }) {
     setSelectedFromDate(new Date(new Date().setDate(new Date().getDate() + amountOfReservations)));
     setSelectedToDate(new Date(new Date().setDate(new Date().getDate() + amountOfReservations + 1)));
   }
+
+  if (listingInfo === undefined || ownerInfo === undefined) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size='large' color='#0000ff' />
+      </View>
+    );
+  }
   return (
     <View style={[styles.container]}>
       <ScrollView>
@@ -285,12 +293,11 @@ export default function ConfirmReservation({ route, navigation }) {
           <Text style={styles.headingTitle}>What This Place Offers</Text>
           <View style={[styles.divider]}></View>
 
-          {/* Make this a FlatList */}
-          <FlatList
-            data={listingInfo.amenities}
-            renderItem={({ item }) => <AmenitiesItem amenity={item} />}
-            keyExtractor={(item) => item}
-          />
+          {/* Do not make this a FlatList as you cannot have it within a scrollview */}
+          {listingInfo.amenities && Array.isArray(listingInfo.amenities) && listingInfo.amenities.map((amenity, index) => (
+            <AmenitiesItem key={index} amenity={amenity} />
+          ))}
+          
         </View>
 
         {/* Pick Dates */}
