@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
-  Alert,
 } from 'react-native';
 import * as Location from 'expo-location';
 import { useIsFocused } from '@react-navigation/native';
@@ -15,7 +14,7 @@ import { useState, useEffect } from 'react';
 
 import { db } from '../firebaseConfig';
 import { addDoc, getDocs, collection } from 'firebase/firestore';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 
 import isUserInputValid from '../utils/validateUserInput.js';

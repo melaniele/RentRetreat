@@ -1,5 +1,4 @@
-import { StackActions, useIsFocused } from "@react-navigation/native";
-import { signOut } from "firebase/auth";
+import { useIsFocused } from "@react-navigation/native";
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
@@ -13,7 +12,7 @@ import {
 import HouseInfo from "../components/HouseInfo";
 import UserInfo from "../components/UserInfo";
 import { manageBookingsStyles } from "../css/manageBookingStyles";
-import { auth, db } from "../firebaseConfig";
+import { db } from "../firebaseConfig";
 import { useAuth } from "../store/AuthContext";
 import LogoutButton
  from "../components/LogoutButton";
