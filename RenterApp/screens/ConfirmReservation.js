@@ -25,7 +25,7 @@ import AmenitiesItem from '../components/AmenitiesItem';
 import RNDateTimePicker, {
   DateTimePicker,
 } from '@react-native-community/datetimepicker';
-import { useAuth } from '../components/AuthContext';
+import { useAuth } from '../store/AuthContext';
 import LogoutButton from '../components/LogoutButton';
 
 const SAMPLE_LISTING = {

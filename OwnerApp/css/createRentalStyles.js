@@ -4,8 +4,6 @@ export const createRentalStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // alignItems: 'center',
-    // justifyContent: 'center',
     padding: 25,
     gap: 50
   },
@@ -19,7 +17,6 @@ export const createRentalStyles = StyleSheet.create({
   },
   inputContainer: {
     width: '100%',
-    // alignItems: 'center',
     justifyContent: 'space-between',
     flexDirection: 'row',
     paddingHorizontal: 15
@@ -61,8 +58,8 @@ export const createRentalStyles = StyleSheet.create({
     borderWidth: 1, fontSize: 20, paddingHorizontal: 10, borderRadius: 4, height: 150, width: '100%', borderColor: 'gray'
   },
   button: {
-    backgroundColor: '#4CAF50', // A modern green color
-    borderRadius: 8, // More rounded corners
+    backgroundColor: '#4CAF50',
+    borderRadius: 8,
     height: 50,
     width: '100%',
     alignItems: 'center',
