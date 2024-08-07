@@ -1,8 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { AntDesign, Octicons } from '@expo/vector-icons';
-
+import { FontAwesome6, FontAwesome5 } from '@expo/vector-icons';
 import Login from './screens/Login.js';
 import CreateRental from './screens/CreateRental.js';
 import ManageBookings from './screens/ManageBookings.js';
@@ -21,8 +20,7 @@ const TabContainerComponent = () => {
           headerShown: true,
           tabBarLabel: 'Create Rental',
           tabBarIcon: ({ color, size }) => (
-            <AntDesign
-              name="form"
+            <FontAwesome6 name="house-chimney-medical"
               color={color}
               size={size}
             />
@@ -36,8 +34,7 @@ const TabContainerComponent = () => {
           headerShown: true,
           tabBarLabel: 'Manage Bookings',
           tabBarIcon: ({ color, size }) => (
-            <Octicons
-              name="gear"
+            <FontAwesome5 name="calendar-check"
               color={color}
               size={size}
             />

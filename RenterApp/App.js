@@ -3,7 +3,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { StatusBar } from "react-native";
-
 import Login from "./screens/Login";
 import Discover from "./screens/Discover";
 import ConfirmReservation from "./screens/ConfirmReservation";
@@ -16,16 +15,14 @@ const Tab = createBottomTabNavigator();
 const TabContainerComponent = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
-      tabBarIcon: ({ focused }) => {
+      tabBarIcon: ({size,color }) => {
         if (route.name == "Discover") {
-          return <FontAwesome5 name="home" size={24} color={focused ? "black" : "gray"} />;
+          return <FontAwesome5 name="home" size={size} color={color} />;
         }
         if (route.name === "My Reservations") {
-          return <FontAwesome5 name="calendar-alt" size={24} color={focused ? "black" : "gray"} />;
+          return <FontAwesome5 name="calendar-check" size={size} color={color} />;
         }
       },
-      tabBarActiveTintColor: "black",
-      tabBarInactiveTintColor: "gray",
     })}
   >
     <Tab.Screen name="Discover" component={Discover}
