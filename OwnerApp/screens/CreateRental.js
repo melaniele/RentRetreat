@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import * as Location from 'expo-location';
-import { useIsFocused, StackActions } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 
 import { useState, useEffect } from 'react';
 
@@ -20,7 +20,6 @@ import { auth } from '../firebaseConfig';
 
 import isUserInputValid from '../utils/validateUserInput.js';
 import { createRentalStyles } from '../css/createRentalStyles.js';
-import { loginStyles } from '../css/loginStyles.js';
 import { useAuth } from '../store/AuthContext';
 import LogoutButton from '../components/LogoutButton.js';
 
@@ -91,7 +90,7 @@ export default function CreateRental({ navigation }) {
         return false;
       }
 
-      return {latitude: result.latitude, longitude: result.longitude};
+      return { latitude: result.latitude, longitude: result.longitude };
     } catch (err) {
       console.log(err);
       return false;
@@ -181,7 +180,9 @@ export default function CreateRental({ navigation }) {
           },
         ]}
       >
-        <ScrollView  contentContainerStyle={{paddingHorizontal: 35, paddingBottom: 30}}>
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 35, paddingBottom: 30 }}
+        >
           {isLoading ? (
             <ActivityIndicator size='large' color='#0000ff' />
           ) : (
