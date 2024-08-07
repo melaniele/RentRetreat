@@ -85,7 +85,6 @@ export default function CreateRental({ navigation }) {
 
       //first location is the most accurate
       const result = geocodedLocation[0];
-      // console.log(result);
       if (result === undefined) {
         return false;
       }
