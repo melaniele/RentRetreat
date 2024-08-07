@@ -39,7 +39,7 @@ const LogoutButton = () => {
     >
       <Text
         style={{
-          fontSize: 18,
+          fontSize: 15,
           color: '#c0392b',
         }}
       >

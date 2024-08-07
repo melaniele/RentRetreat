@@ -24,20 +24,6 @@ export default function ManageBookings({ navigation }) {
   const isUserOnThisScreen = useIsFocused();
   const { loggedInUserEmail } = useAuth();
 
-  const logoutPressed = async () => {
-    try {
-      await signOut(auth);
-      navigation.dispatch(StackActions.popToTop());
-      console.log("user has been logged out");
-    } catch (error) {
-      console.error(`error logging out: ${error}`);
-      Alert.alert(
-        "Error logging out",
-        `There was an error logging out: ${error}`
-      );
-    }
-  };
-
   const setHeader = () => {
     navigation.setOptions({
       headerRight: () => (
