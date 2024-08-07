@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../store/AuthContext";
 import { loginStyles } from "../css/loginStyles";
 import { auth, db } from "../firebaseConfig";
 

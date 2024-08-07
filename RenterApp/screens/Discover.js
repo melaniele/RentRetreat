@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useAuth } from '../components/AuthContext';
+import { useAuth } from '../store/AuthContext';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';

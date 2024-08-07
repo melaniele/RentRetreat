@@ -8,7 +8,7 @@ import Login from "./screens/Login";
 import Discover from "./screens/Discover";
 import ConfirmReservation from "./screens/ConfirmReservation";
 import MyReservations from "./screens/MyReservations";
-import { AuthProvider } from "./components/AuthContext";
+import { AuthProvider } from "./store/AuthContext";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

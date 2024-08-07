@@ -4,7 +4,7 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../store/AuthContext";
 import { useEffect, useState } from "react"
 import { useIsFocused } from "@react-navigation/native"
 import { db } from '../firebaseConfig';
