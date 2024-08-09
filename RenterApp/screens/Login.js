@@ -48,7 +48,7 @@ export default Login = ({ navigation }) => {
           });
           handleClearFields();
         } else {
-          setError("User is not an renter, please try again!");
+          setError("User is not a renter, please try again!");
         }
       } catch (error) {
         setError("Credentials are invalid, please try again!");
