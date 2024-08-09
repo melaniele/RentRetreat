@@ -66,10 +66,17 @@ export default function MyReservations({ navigation }) {
     }
 
     try {
+      // Gets the listings from the listings collection but for the user's city
+      const listingsRef = query(collection(db, 'listings'), where("city", "==", userCityLocation));
+      const querySnapshot = await getDocs(listingsRef);
+
+      // Gets the users from the users collection but for owner accounts.
+      const usersRef = query(collection(db, 'users'), where("userType", "==", "owner"));
+      const querySnapshotUsers = await getDocs(usersRef);
+
+
       let updatedReservedListings = await Promise.all(
         reservationRequests.map(async (reservedListing) => {
-          const listingsRef = query(collection(db, 'listings'), where("city", "==", userCityLocation));
-          const querySnapshot = await getDocs(listingsRef);
           querySnapshot.forEach((doc) => {
             if (
               doc.data().ownerEmail === reservedListing.ownerEmail &&
@@ -92,8 +99,6 @@ export default function MyReservations({ navigation }) {
             }
           });
 
-          const usersRef = query(collection(db, 'users'), where("userType", "==", "owner"));
-          const querySnapshotUsers = await getDocs(usersRef);
           querySnapshotUsers.forEach((doc) => {
             if (doc.data().email === reservedListing.ownerEmail) {
               Object.assign(reservedListing, {
