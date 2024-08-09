@@ -105,11 +105,15 @@ export default function ManageBookings({ navigation }) {
       }
 
       try {
+        const listingsRef = collection(db, "listings");
+        const listingsQuerySnapshot = await getDocs(listingsRef);
+
+        const usersRef = collection(db, 'users');
+        const usersQuerySnapshot = await getDocs(usersRef);
+
         const updatedReservedListings = await Promise.all(
           reservedListings.map(async (reservedListing) => {
-            const listingsRef = collection(db, "listings");
-            const querySnapshot = await getDocs(listingsRef);
-            querySnapshot.forEach((doc) => {
+            listingsQuerySnapshot.forEach((doc) => {
               if (
                 doc.data().ownerEmail === loggedInUserEmail &&
                 doc.id === reservedListing.listingID
@@ -131,9 +135,7 @@ export default function ManageBookings({ navigation }) {
               }
             });
 
-            const usersRef = collection(db, "users");
-            const querySnapshotUsers = await getDocs(usersRef);
-            querySnapshotUsers.forEach((doc) => {
+            usersQuerySnapshot.forEach((doc) => {
               if (
                 doc.data().userType === "renter" &&
                 doc.data().email === reservedListing.renterEmail
