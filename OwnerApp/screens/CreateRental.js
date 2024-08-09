@@ -116,8 +116,8 @@ export default function CreateRental({ navigation }) {
     let amenities = [];
 
     try {
-      const countriesRef = collection(db, 'homes');
-      const querySnapshot = await getDocs(countriesRef);
+      const homesRef = collection(db, 'homes');
+      const querySnapshot = await getDocs(homesRef);
       querySnapshot.forEach((doc) => {
         homes = doc.data();
       });
